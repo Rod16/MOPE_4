@@ -128,57 +128,60 @@ while True:
 	                                                                                        list_ai[6], list_ai[7]))
 
 	gp = max(disp.values()) / disp_sum
-	f1 = m -1
-	f2 = n
-	gt = cochrane_teor(f1, f2)
+	for i in range(m,20,1):
+		f1 = m -1
+		f2 = n
+		gt = cochrane_teor(f1, f2)
 
-	if cochrane(gp, gt):
-	    print("Дисперсія є однорідною\n")
+		if cochrane(gp, gt):
+			print("Дисперсія є однорідною при m = ",m)
+			break
+		else:
+			print("Дисперсія не є однорідною при m = ", m)
+			m += 1
+			continue
 
-	    dispersion_b = disp_sum / n
-	    dispersion_beta = dispersion_b / (m * n)
-	    s_beta = math.sqrt(abs(dispersion_beta))
+	dispersion_b = disp_sum / n
+	dispersion_beta = dispersion_b / (m * n)
+	s_beta = math.sqrt(abs(dispersion_beta))
 
-	    beta = {}
-	    for x in range(8):
-	        beta["beta{0}".format(x)] = 0
-	    for i in range(len(x0f)):
-	        ctr = 0
-	        for key, value in beta.items():
-	            beta[key] += (y_ser[i] * list_fact[ctr][i]) / n
-	            ctr += 1
+	beta = {}
+	for x in range(8):
+	    beta["beta{0}".format(x)] = 0
+	for i in range(len(x0f)):
+	    ctr = 0
+	    for key, value in beta.items():
+	        beta[key] += (y_ser[i] * list_fact[ctr][i]) / n
+	        ctr += 1
 
-	    beta_list = list(beta.values())
-	    t_list = [abs(k) / s_beta for k in beta_list]
+	beta_list = list(beta.values())
+	t_list = [abs(k) / s_beta for k in beta_list]
 
-	    f3 = f1 * f2
-	    d = 0
-	    t = student_t(df=f3)
-	    print("t = ", t)
-	    for i in range(len(t_list)):
-	        if student(t_list[i], t):
-	            beta_list[i] = 0
-	            print("Коефцієнт не є значущим, beta{} = 0".format(i))
-	        else:
-	            print("Коефіцієнт є значущим, beta{} = {}".format(i, beta_list[i]))
-	            d += 1
-
-	    list_fact[0] = None
-	    y_student = [sum([a * b[x_idx] if b else a for a, b in zip(beta_list, list_x)]) for x_idx in range(8)]
-
-	    f4 = n - d
-	    dispersion_ad = 0
-	    for i in range(len(y_student)):
-	        dispersion_ad += ((y_student[i] - y_ser[i]) ** 2) * m / (n - d)
-	    fp = dispersion_ad / dispersion_beta
-	    ft = fisher_t(dfn=f4, dfd=f3)
-	    if fisher(ft, fp):
-	        print("Рівняння регресії є адекватним")
-	        break
+	f3 = f1 * f2
+	d = 0
+	t = student_t(df=f3)
+	print("t = ", t)
+	for i in range(len(t_list)):
+	    if student(t_list[i], t):
+	        beta_list[i] = 0
+	        print("Коефцієнт не є значущим, beta{} = 0".format(i))
 	    else:
-	        print("Рівняння регресії не є адекватним")
-	        break
+	        print("Коефіцієнт є значущим, beta{} = {}".format(i, beta_list[i]))
+	        d += 1
 
+	list_fact[0] = None
+	y_student = [sum([a * b[x_idx] if b else a for a, b in zip(beta_list, list_x)]) for x_idx in range(8)]
+
+	f4 = n - d
+	dispersion_ad = 0
+	for i in range(len(y_student)):
+	    dispersion_ad += ((y_student[i] - y_ser[i]) ** 2) * m / (n - d)
+	fp = dispersion_ad / dispersion_beta
+	ft = fisher_t(dfn=f4, dfd=f3)
+	if fisher(ft, fp):
+	    print("Рівняння регресії є адекватним")
+	    break
 	else:
-	    print("Дисперсія не є однорідною")
-	    m += 1
+	    print("Рівняння регресії не є адекватним")
+	    break
+
